@@ -22,18 +22,21 @@ connectDB();
 
 const app = express();
 
-// ------------------ CORS ------------------
+// ----- FIXED CORS -----
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://your-frontend-domain.com'], // add deployed frontend URL too
-  credentials: true // needed for cookies or Authorization headers
+  origin: [
+    "http://localhost:5173",
+    "https://next-door-frontend.vercel.app"  // <-- FIXED (no trailing slash)
+  ],
+  credentials: true
 }));
 
-// ------------------ Middleware ------------------
+// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// ------------------ Session ------------------
+// ----- Session -----
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -42,26 +45,25 @@ app.use(
   })
 );
 
-// ------------------ Passport ------------------
+// ----- Passport -----
+configurePassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
-configurePassport(); // only once
 
-// ------------------ Static uploads ------------------
-app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
-
-// ------------------ Routes ------------------
-app.use(verifyPaymentRouter);
+// ----- Routes -----
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/courses", courseRoutes);
-app.use('/api/blog', blogRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/student', studentRoutes);
+app.use("/api/blog", blogRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/student", studentRoutes);
+app.use("/api/payment", verifyPaymentRouter);
 
-// ------------------ Error Handlers ------------------
+// Error handlers
 app.use(notFound);
 app.use(errorHandler);
 
-export default app;
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
