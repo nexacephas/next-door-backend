@@ -15,18 +15,25 @@ import { configurePassport } from "./config/passport.js";
 import blogRoutes from './routes/blogRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
+import path from "path";
+
 dotenv.config();
 connectDB();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ------------------ CORS ------------------
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://your-frontend-domain.com'], // add deployed frontend URL too
+  credentials: true // needed for cookies or Authorization headers
+}));
+
+// ------------------ Middleware ------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Session middleware (before passport)
+// ------------------ Session ------------------
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -34,28 +41,26 @@ app.use(
     saveUninitialized: false,
   })
 );
-// Mount the route
-app.use(verifyPaymentRouter);
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-// Passport
+
+// ------------------ Passport ------------------
 app.use(passport.initialize());
 app.use(passport.session());
 configurePassport(); // only once
 
-// Serve uploaded files
-import path from "path";
+// ------------------ Static uploads ------------------
 app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
-// Routes
+// ------------------ Routes ------------------
+app.use(verifyPaymentRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/courses", courseRoutes);
-
 app.use('/api/blog', blogRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/student', studentRoutes);
-// Error Handlers
+
+// ------------------ Error Handlers ------------------
 app.use(notFound);
 app.use(errorHandler);
 
