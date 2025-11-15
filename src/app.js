@@ -15,28 +15,25 @@ import { configurePassport } from "./config/passport.js";
 import blogRoutes from './routes/blogRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
-import path from "path";
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-// ----- FIXED CORS -----
+// CORS
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://next-door-frontend.vercel.app"  // <-- FIXED (no trailing slash)
+    "https://next-door-frontend.vercel.app"
   ],
   credentials: true
 }));
 
-// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// ----- Session -----
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -45,12 +42,12 @@ app.use(
   })
 );
 
-// ----- Passport -----
+// Passport
 configurePassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ----- Routes -----
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
@@ -60,10 +57,9 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/payment", verifyPaymentRouter);
 
-// Error handlers
+// Errors
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ❗ No app.listen() here
+export default app;
