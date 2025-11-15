@@ -7,7 +7,7 @@ import Order from '../models/Order.js';
 
 const router = express.Router();
 
-router.post('/api/verify-payment', protect, async (req, res) => {
+router.post('/verify-payment', protect, async (req, res) => {
   const { reference, items } = req.body;
 
   if (!reference) return res.status(400).json({ status: 'error', message: 'Reference is required' });
