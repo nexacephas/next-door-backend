@@ -35,7 +35,9 @@ export const createProduct = async (req, res) => {
     const { name, category, brand, price, stock, description, specs } = req.body;
 
     // file upload handler
-    const imageUrl = req.file ? `/uploads/products/${req.file.filename}` : '';
+    const cleanFileName = req.file ? req.file.filename.replace(/"/g, "") : "";
+    const imageUrl = cleanFileName ? `/uploads/products/${cleanFileName}` : "";
+
 
     const product = new Product({
       name,
@@ -76,7 +78,11 @@ export const updateProduct = async (req, res) => {
     product.specs = specs ? specs.split(',') : product.specs;
 
     // update image if uploaded
-    if (req.file) product.imageUrl = `/uploads/products/${req.file.filename}`;
+  if (req.file) {
+  const cleanFileName = req.file.filename.replace(/"/g, "");
+  product.imageUrl = `/uploads/products/${cleanFileName}`;
+}
+
 
     await product.save();
     res.json(product);

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
+import path from "path";
 import cors from "cors";
 import morgan from "morgan";
 import session from "express-session";
@@ -46,6 +47,7 @@ app.use(
 configurePassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Routes
 app.use("/api/auth", authRoutes);
