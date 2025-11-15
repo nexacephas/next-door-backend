@@ -1,0 +1,5 @@
+# .gitignore
+.env
+uploads/courses/*.json
+# Node modules
+node_modules/
